@@ -10,36 +10,33 @@
         html, body {
             margin: 0;
             padding: 0;
+            height: 100vh; /* মোবাইলের জন্য ভিউপোর্ট হাইট ফিক্সড করা হলো */
+            width: 100vw;
             overflow: hidden;
-            height: 100%;
-            width: 100%;
             background-color: #0f172a;
-            -webkit-overflow-scrolling: touch; /* মোবাইলে স্ক্রলিং স্মুথ করার জন্য */
         }
         
         .main-container {
-            position: relative;
             width: 100%;
             height: 100%;
             overflow: hidden;
+            -webkit-overflow-scrolling: touch;
         }
 
         iframe {
             position: absolute;
-            top: -55px; /* ব্যানার লুকানোর ট্রিক */
+            top: -55px;
             left: 0;
             width: 100%;
             height: calc(100% + 55px); 
             border: none;
-            display: block;
         }
     </style>
 </head>
 <body>
 
     <div class="main-container">
-        <!-- src এর ভেতর আপনার নতুন জেনারেট হওয়া /exec লিংকটি বসাবেন -->
-        <iframe src="https://script.google.com/macros/s/AKfycbzmiZsRECEPxFN2Inri9YPGik1oa6vK87V_WeDOFXS0YUFHf7LrItTflCQ7FX7K7VFHhw/exec" scrolling="yes"></iframe>
+        <iframe src="https://script.google.com/macros/s/AKfycbzmiZsRECEPxFN2Inri9YPGik1oa6vK87V_WeDOFXS0YUFHf7LrItTflCQ7FX7K7VFHhw/exec"></iframe>
     </div>
 
 </body>
