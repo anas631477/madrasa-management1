@@ -2,8 +2,10 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
+    <!-- মোবাইলে স্ক্রিন ফিট এবং জুম কন্ট্রোল করার জন্য মেটা ট্যাগ আপডেট করা হলো -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>মানিকপীর হাফেজিয়া মাদ্রাসা - ড্যাশবোর্ড</title>
+    
     <style>
         html, body {
             margin: 0;
@@ -11,12 +13,13 @@
             overflow: hidden;
             height: 100%;
             width: 100%;
-            background-color: #0f172a;
-            /* মোবাইলের স্ক্রলিং বাঘ দূর করার জন্য নিচের লাইনগুলো যোগ করা হয়েছে */
-            -webkit-overflow-scrolling: touch;
+            background-color: #0f172a; /* আপনার অ্যাপের ব্যাকগ্রাউন্ড কালার */
+            /* মোবাইলের স্ক্রলিং স্মুথ করার জন্য */
+            -webkit-overflow-scrolling: touch; 
         }
-        
-        .iframe-wrapper {
+
+        /* আইফ্রেমটিকে একটি নিরাপদ কন্টেইনারের মধ্যে রাখা হলো */
+        .iframe-container {
             position: relative;
             width: 100%;
             height: 100%;
@@ -25,21 +28,22 @@
 
         iframe {
             position: absolute;
-            top: -55px; /* ব্যানার লুকানোর ট্রিক */
+            top: -55px; /* আপনার সেই চমৎকার ব্যানার লুকানোর ট্রিক */
             left: 0;
             width: 100%;
             height: calc(100% + 55px); 
             border: none;
             
-            /* মোবাইল ব্রাউজারকে আইফ্রেমের কন্টেন্ট সঠিকভাবে দেখাতে বাধ্য করার জন্য */
+            /* মোবাইল ব্রাউজার যেন জোরপূর্বক কন্টেন্ট লোড করে তার জন্য */
             min-width: 100%;
-            *width: 100%;
+            display: block;
         }
     </style>
 </head>
 <body>
 
-    <div class="iframe-wrapper">
+    <!-- কন্টেইনার ডিভ যা মোবাইলের বাঘ (Bug) দূর করবে -->
+    <div class="iframe-container">
         <iframe src="https://script.google.com/macros/s/AKfycbx-WTw0z6wRi8Wyhn1yeyaACYBmcfCapA1iMfHmluQz5zVi9u5PDgdAZVz1BM0NX0-knA/exec"></iframe>
     </div>
 
