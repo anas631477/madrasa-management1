@@ -60,9 +60,20 @@
             color: #38bdf8;
         }
         .login-card p {
-            margin: 0 0 24px 0;
+            margin: 0 0 20px 0;
             color: #94a3b8;
             font-size: 14px;
+        }
+        .error-msg {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+            text-align: center;
         }
         .input-group {
             margin-bottom: 20px;
@@ -106,7 +117,7 @@
             background: #0369a1;
         }
         
-        /* 📱 মূল অ্যাপ কন্টেইনার (লগইনের পর সোর্স একটিভ হবে) */
+        /* 📱 মূল অ্যাপ কন্টেইনার */
         .main-container {
             width: 100%;
             height: 100%;
@@ -129,19 +140,22 @@
         <div class="login-card">
             <img src="https://lh3.googleusercontent.com/d/1ZgIsgAfGHmoJuK86BmxUQBIz51vAlFxE" alt="Madrasa Logo" class="madrasa-logo" />
             <h2>লাইসেন্স ভেরিফিকেশন</h2>
-            <p>সফটওয়্যারটি ব্যবহার করতে অনুগ্রহ করে ইউজারনেম এবং পাসওয়ার্ড/ লাইসেন্স কি দিন</p>
+            <p>সফটওয়্যারটি ব্যবহার করতে অনুগ্রহ করে ইউজারনেম এবং পাসওয়ার্ড দিন</p>
+            
+            <!-- এরর মেসেজ দেখানোর কন্টেইনার -->
+            <div class="error-msg" id="errorBlock"></div>
             
             <div class="input-group">
-                <label for="username">ইউজারনেম</label>
-                <input type="text" id="username" placeholder="যেমন: manikpir" required />
+                <label for="username">ইউজারনেম / ফোন নম্বর</label>
+                <input type="text" id="username" placeholder="যেমন: anas অথবা 1310250516" required />
             </div>
             
             <div class="input-group">
-                <label for="licenseKey">লাইসেন্স কি / পাসওয়ার্ড</label>
-                <input type="password" id="licenseKey" placeholder="যেমন: manikpir@969" required />
+                <label for="licenseKey">পাসওয়ার্ড</label>
+                <input type="password" id="licenseKey" placeholder="যেমন: tamanna@77" required />
             </div>
             
-            <button class="login-btn" id="loginBtn" onclick="validateAndLaunch()">🔑 সক্রিয় করুন</button>
+            <button class="login-btn" id="loginBtn" onclick="validateAndLaunch()">🔑 যাচাই ও সক্রিয় করুন</button>
         </div>
     </div>
 
@@ -150,55 +164,88 @@
     </div>
 
     <script>
-        // 🎯 আপনার দেওয়া নতুন সিকিউরড গুগল ব্যাকএন্ড লিঙ্ক
-        var GAS_URL = "https://script.google.com/macros/s/AKfycbxZGTNP_noyYM2SmSDbhgORtBs4kE-SSWCOU1nrSN6RErJ1NUTvUk9OI476LA93Cf7p3A/exec";
+        // 🎯 আপনার গুগল এক্সিকিউটেবল ম্যাক্রো লিঙ্ক
+        var GAS_URL = "https://script.google.com/macros/s/AKfycbz6gN9ad_muygicWHBm6kOlOFfxrowy__BDxVdCYMI-BHK54mDIVJ7moLId1s22uvCfmA/exec";
+
+        function showMsg(text) {
+            var errBlock = document.getElementById('errorBlock');
+            errBlock.innerText = text;
+            errBlock.style.display = 'block';
+        }
 
         function validateAndLaunch() {
             var userField = document.getElementById('username').value.trim();
             var keyField  = document.getElementById('licenseKey').value.trim();
+            var btn = document.getElementById('loginBtn');
+            var errBlock = document.getElementById('errorBlock');
 
             if (!userField || !keyField) {
-                alert('অনুগ্রহ করে ইউজারনেম এবং লাইসেন্স কি দুটোই সঠিকভাবে লিখুন।');
+                showMsg('❌ অনুগ্রহ করে ইউজারনেম এবং পাসওয়ার্ড দুটোই সঠিকভাবে লিখুন।');
                 return;
             }
 
-            // 🚀 সিকিউর ইউআরএল জেনারেশন (প্যারামিটার সহ)
-            var secureLink = GAS_URL + "?user=" + encodeURIComponent(userField) + "&key=" + encodeURIComponent(keyField);
+            errBlock.style.display = 'none';
+            btn.innerText = "সার্ভার যাচাই করা হচ্ছে...";
+            btn.disabled = true;
 
-            // ইন্টারফেস পরিবর্তন
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('mainAppContainer').style.display = 'block';
-            
-            // আইফ্রেমের সোর্সে রিকোয়েস্ট পাঠানো হলো
-            document.getElementById('appIframe').src = secureLink;
+            // 🚀 ব্যাকগ্রাউন্ডে গুগল শিটে রিকোয়েস্ট পাঠানো (API Fetch)
+            var requestUrl = GAS_URL + "?user=" + encodeURIComponent(userField) + "&key=" + encodeURIComponent(keyField);
+
+            fetch(requestUrl)
+                .then(response => response.json())
+                .then(data => {
+                    // যদি আপনার গুগল শিট ফাইল রেসপন্সে success: true পাঠায়
+                    if (data && data.success) {
+                        btn.innerText = "🎉 লগইন সফল! ড্যাশবোর্ড ওপেন হচ্ছে...";
+                        
+                        // সিকিউর লিঙ্ক আইফ্রেমে সেট করা হলো
+                        document.getElementById('appIframe').src = requestUrl;
+                        
+                        // ইন্টারফেস চেঞ্জ
+                        document.getElementById('loginOverlay').style.display = 'none';
+                        document.getElementById('mainAppContainer').style.display = 'block';
+                    } else {
+                        // যদি ভুল পাসওয়ার্ড বা ইনঅ্যাক্টিভ ইউজার হয়
+                        showMsg("❌ " + (data.error ? data.error : "ভুল ইউজার আইডি অথবা পাসওয়ার্ড!"));
+                        btn.innerText = "🔑 যাচাই ও সক্রিয় করুন";
+                        btn.disabled = false;
+                    }
+                })
+                .catch(err => {
+                    // কোনো কারণে নেট বা গুগল স্ক্রিপ্ট ব্লক থাকলে আইফ্রেম ডিরেক্ট রান করার ব্যাকআপ ব্যবস্থা
+                    console.log("Fetch blocked, using direct bypass method...");
+                    document.getElementById('appIframe').src = requestUrl;
+                    document.getElementById('loginOverlay').style.display = 'none';
+                    document.getElementById('mainAppContainer').style.display = 'block';
+                });
         }
 
-        // কীবোর্ডের এন্টার চাপলে যেন অটো সাবমিট হয়
+        // কীবোর্ডের এন্টার চাপলে অটো সাবমিট
         document.getElementById('licenseKey').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                validateAndLaunch();
+            }
+        });
+
+        // কীবোর্ডের এন্টার ইউজারনেম বক্সেও কাজ করানোর জন্য
+        document.getElementById('username').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 validateAndLaunch();
             }
         });
     </script>
 
+    <!-- 🚫 সিকিউরিটি প্রোটেকশন (রাইট ক্লিক ও ডেভ টুলস ব্লক) -->
     <script>
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
         });
 
         document.onkeydown = function(e) {
-            if (e.keyCode == 123) {
-                return false;
-            }
-            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
-                return false;
-            }
-            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
-                return false;
-            }
-            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
-                return false;
-            }
+            if (e.keyCode == 123) return false; // F12
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 73) return false; // Ctrl+Shift+I
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 74) return false; // Ctrl+Shift+J
+            if (e.ctrlKey && e.keyCode == 85) return false; // Ctrl+U
         };
     </script>
 
