@@ -126,13 +126,13 @@
             position: relative;
         }
         
-        /* 🚀 গুগলের টপ ব্যানার চিরতরে ওপরে ঠেলে হাইড করার ম্যাজিক ট্রিক */
+        /* 🚀 গুগলের টপ ব্যানার চিরতরে ওপরে ঠেলে স্ক্রিনের বাইরে পাঠিয়ে দেওয়ার ম্যাজিক মার্জিন */
         iframe {
             position: absolute;
-            top: -50px; /* গুগলের ব্যানার ৫০ পিক্সেল ওপরে উঠে হাওয়া হয়ে যাবে */
+            top: -50px; 
             left: 0;
             width: 100%;
-            height: calc(100vh + 50px); /* ওপরে তোলার ব্যালেন্স ঠিক রাখতে হাইট ৫০ পিক্সেল প্লাস */
+            height: calc(100vh + 50px); 
             border: none;
             background-color: #0f172a;
         }
@@ -150,7 +150,7 @@
             
             <div class="input-group">
                 <label for="username">ইউজারনেম / ফোন নম্বর</label>
-                <input type="text" id="username" placeholder="যেমন: anas অথবা 1310250516" required />
+                <input type="text" id="username" placeholder="যেমন: anas अथवा 1310250516" required />
             </div>
             
             <div class="input-group">
@@ -168,9 +168,9 @@
 
     <script>
         // 🎯 আপনার গুগল এক্সিকিউটেবল ম্যাক্রো লিঙ্ক
-        var GAS_URL = "https://script.google.com/macros/s/AKfycby-daWn--yfA-ErlZh4qUc-CBOMGXrKceAYOYCeP-Hc7Jh5t6t2g7zX5auzvaqt0Rda/exec";
+        var GAS_URL = "https://script.google.com/macros/s/AKfycbxfP5HRWmLx6tSCM3RVMQXciFNOKzOrDX00-zDvLXmWTFleRGzjXHclVZ8Mm6h7OnxciQ/exec";
 
-        // 🚨 গিটহাব পেজ লোড হওয়ার সময়ই চেক করবে কেউ ডিরেক্ট লিঙ্ক থেকে লাত্থি খেয়ে ফেরত এসেছে কিনা
+        // 🚨 গিটহাব পেজ লোড হওয়ার সময়ই চেক করবে কেউ ডিরেক্ট লিঙ্ক থেকে রিডাইরেক্ট হয়ে ফেরত এসেছে কিনা
         window.addEventListener('DOMContentLoaded', function() {
             var urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('status') === 'denied') {
