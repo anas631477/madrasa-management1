@@ -46,6 +46,10 @@
             max-width: 450px;
             text-align: center;
             border: 1px solid #334155;
+            
+            /* 🎯 ডিরেক্ট লিঙ্ক বা লগইনের সময় পেজের পারফেক্ট টপ পজিশনিং নিশ্চিত করার জন্য মার্জিন ব্যালেন্স */
+            margin-top: 0;
+            transform: translateY(0);
         }
         .madrasa-logo {
             width: 90px;
@@ -126,7 +130,7 @@
             position: relative;
         }
         
-        /* 🚀 গুগলের টপ ব্যানার চিরতরে ওপরে ঠেলে স্ক্রিনের বাইরে পাঠিয়ে দেওয়ার ম্যাজিক মার্জিন */
+        /* 🚀 গুগলের টপ ব্যানার চিরতরে ওপরে ঠেলে স্ক্রিনের বাইরে পাঠিয়ে দেওয়ার ম্যাজিক মার্জিন */
         iframe {
             position: absolute;
             top: -50px; 
@@ -150,7 +154,7 @@
             
             <div class="input-group">
                 <label for="username">ইউজারনেম / ফোন নম্বর</label>
-                <input type="text" id="username" placeholder="যেমন: anas अथवा 1310250516" required />
+                <input type="text" id="username" placeholder="যেমন: anas অথবা 1310250516" required />
             </div>
             
             <div class="input-group">
@@ -168,20 +172,23 @@
 
     <script>
         // 🎯 আপনার গুগল এক্সিকিউটেবল ম্যাক্রো লিঙ্ক
-        var GAS_URL = "https://script.google.com/macros/s/AKfycbwsDtwIafTowGMkTguOqurin63YyKong3zgDQtXF5Ct8xgWg5ZFRPHXNNSCy55A9ono0A/exec";
+        var GAS_URL = "https://script.google.com/macros/s/AKfycbx6d-g5FdoQaV6aHLjd_AuollP47vIQD1LpaunkJ3ND8867cnZU1eHgSGBGCwcEOfHBbA/exec";
 
-        // 🚨 গিটহাব পেজ লোড হওয়ার সময়ই চেক করবে কেউ ডিরেক্ট লিঙ্ক থেকে রিডাইরেক্ট হয়ে ফেরত এসেছে কিনা
+        // 🚨 গিটহাব পেজ লোড হওয়ার সময়ই চেক করবে কেউ ডিরেক্ট লিঙ্ক থেকে রিডাইরেক্ট হয়ে ফেরত এসেছে কিনা
         window.addEventListener('DOMContentLoaded', function() {
             var urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('status') === 'denied') {
-                // মেইন লগইন ফর্মটি বদলে গিটহাব থিমের ভেতরই "Access Denied" বক্স জেনারেট করবে
+                // মেইন লগইন ফর্মটি বদলে গিটহাব থিমের ভেতরই "Access Denied" বক্স জেনারেট করবে (কোনো গুগলের ব্যানার থাকবে না!)
                 document.getElementById('loginCardContainer').innerHTML = `
-                    <div style="font-size: 60px; margin-bottom: 15px;">🔒</div>
-                    <h2 style="color: #f87171;">Access Denied!</h2>
-                    <p style="color: #94a3b8; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">
-                        আপনি সরাসরি সার্ভার লিঙ্কে প্রবেশের চেষ্টা করেছেন যা সম্পূর্ণ নিষিদ্ধ। <br>অনুগ্রহ করে এই মেইন প্ল্যাটফর্ম থেকে লগইন করুন।
+                    <div style="font-size: 65px; margin-bottom: 15px;">🔒</div>
+                    <h2 style="color: #f87171; margin-bottom: 10px;">অ্যাক্সেস অস্বীকৃত!</h2>
+                    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #f87171; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; font-weight: bold; text-align: center;">
+                        🚨 সরাসরি লিংকে প্রবেশ করা সম্পূর্ণ নিষিদ্ধ।
+                    </div>
+                    <p style="color: #94a3b8; font-size: 14px; line-height: 1.6; margin-bottom: 25px;">
+                        নিরাপত্তাজনিত কারণে এই ক্লাউড সার্ভার ইউআরএলটি লক করা হয়েছে। সফটওয়্যারটি ব্যবহার করতে অনুগ্রহ করে এই মূল প্ল্যাটফর্ম থেকে লগইন করুন।
                     </p>
-                    <button class="login-btn" onclick="window.location.href=window.location.pathname" style="background: #475569;">
+                    <button class="login-btn" onclick="window.location.href=window.location.pathname" style="background: #0284c7; width: 100%; padding: 14px; border-radius: 8px; color: white; font-weight: bold; border: none; cursor: pointer;">
                         🔄 মূল লগইন পেজে ফিরুন
                     </button>
                 `;
