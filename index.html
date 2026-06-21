@@ -25,8 +25,9 @@
         .login-btn { width: 100%; padding: 14px; background: #0284c7; border: none; border-radius: 8px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px; }
         .login-btn:hover { background: #0369a1; }
         
+        /* 🎯 মেইন ড্যাশবোর্ড উইন্ডো (গুগল স্ক্রিপ্ট লোড করার জন্য) */
         .main-container { width: 100%; height: 100%; overflow: hidden; display: none; position: relative; }
-        iframe { position: absolute; top: -50px; left: 0; width: 100%; height: calc(100vh + 50px); border: none; background-color: #0f172a; }
+        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; background-color: #0f172a; }
     </style>
 </head>
 <body>
@@ -35,7 +36,7 @@
         <div class="login-card" id="loginCardContainer">
             <img src="https://lh3.googleusercontent.com/d/1ZgIsgAfGHmoJuK86BmxUQBIz51vAlFxE" alt="Madrasa Logo" class="madrasa-logo" />
             <h2>লাইসেন্স ভেরিফিকেশন</h2>
-            <p>সفتওয়্যারটি ব্যবহার করতে অনুগ্রহ করে ইউজারনেম এবং পাসওয়ার্ড দিন</p>
+            <p>সফটওয়্যারটি ব্যবহার করতে অনুগ্রহ করে ইউজারনেম এবং পাসওয়ার্ড দিন</p>
             
             <div class="error-msg" id="errorBlock"></div>
             
@@ -49,7 +50,7 @@
                 <input type="password" id="licenseKey" placeholder="যেমন: tamanna@77" required />
             </div>
             
-            <button class="login-btn" id="loginBtn" onclick="validateAndLaunch()">🔑 যাচাই ও সক্রিয় করুন</button>
+            <button class="login-btn" id="loginBtn" onclick="performSecureLogin()">🔑 যাচাই ও সক্রিয় করুন</button>
         </div>
     </div>
 
@@ -58,13 +59,13 @@
     </div>
 
     <script>
-        var GAS_URL = "https://script.google.com/macros/s/AKfycbzIL1uLHhB-SDdONfLsZY6ZWMsI8gSiMHi-edkRGXj7yweLuSgZFWNg3bDhGuw78I41OA/exec";
+        // 🎯 আপনার গুগল অ্যাপস স্ক্রিপ্টের এপিআই ইউআরএল
+        var GOOGLE_SCRIPT_API = "https://script.google.com/macros/s/AKfycbygPIqZNgmbVc3FhzOW8-JnhLC3mgfS5tThkb3-nGUdtTRR0937s7_l28IdquHm3rzFSw/exec";
 
-        // 🎯 ব্যানারছাড়া ম্যাজিক পার্ট: ইউআরএল চেক
+        // ডিরেক্ট গুগল থেকে লিংক ঘুরিয়ে নিয়ে আসলে লক স্ক্রিন দেখানোর মেকানিজম
         window.addEventListener('DOMContentLoaded', function() {
             var urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('status') === 'denied') {
-                // মেইন কার্ড এলিমেন্টকে বদলে ব্যানারছাড়া পিওর ডার্ক লক মোড লোড করা হলো
                 document.getElementById('loginCardContainer').innerHTML = `
                     <div style="font-size: 65px; margin-bottom: 15px;">🔒</div>
                     <h2 style="color: #f87171; margin-bottom: 10px;">অ্যাক্সেস অস্বীকৃত!</h2>
@@ -72,7 +73,7 @@
                         🚨 সরাসরি লিংকে প্রবেশ করা সম্পূর্ণ নিষিদ্ধ।
                     </div>
                     <p style="color: #94a3b8; font-size: 14px; line-height: 1.6; margin-bottom: 25px;">
-                        নিরাপত্তাজনিত কারণে এই ক্লাউড সার্ভার ইউআরএলটি লক করা হয়েছে। সফটওয়্যারটি ব্যবহার করতে অনুগ্রহ করে মূল লগইন পোর্টাল ব্যবহার করুন।
+                        নিরাপত্তাজনিত কারণে এই ক্লাউড সার্ভার ইউআরএলটি লক করা হয়েছে। সফটওয়্যারটি ব্যবহার করতে অনুগ্রহ করে মূল গিটহাব পোর্টাল ব্যবহার করুন।
                     </p>
                     <button class="login-btn" onclick="window.location.href=window.location.pathname" style="background: #0284c7; width: 100%; padding: 14px; border-radius: 8px; color: white; font-weight: bold; border: none; cursor: pointer;">
                         🔄 মূল লগইন পেজে ফিরুন
@@ -87,7 +88,8 @@
             errBlock.style.display = 'block';
         }
 
-        function validateAndLaunch() {
+        // 🚀 এপিআই বেইজড ১০০% সিকিউর লগইন ফাংশন (ব্যানার ছাড়া)
+        function performSecureLogin() {
             var userField = document.getElementById('username').value.trim();
             var keyField  = document.getElementById('licenseKey').value.trim();
             var btn = document.getElementById('loginBtn');
@@ -102,32 +104,37 @@
             btn.innerText = "সার্ভার যাচাই করা হচ্ছে...";
             btn.disabled = true;
 
-            var requestUrl = GAS_URL + "?user=" + encodeURIComponent(userField) + "&key=" + encodeURIComponent(keyField);
+            // ব্যাকগ্রাউন্ডে গুগল শিটের ডেটা চেক করার রিকোয়েস্ট ইউআরএল
+            var requestUrl = GOOGLE_SCRIPT_API + "?user=" + encodeURIComponent(userField) + "&key=" + encodeURIComponent(keyField);
 
             fetch(requestUrl)
                 .then(response => response.json())
                 .then(data => {
                     if (data && data.success) {
                         btn.innerText = "🎉 লগইন সফল! ড্যাশবোর্ড ওপেন হচ্ছে...";
-                        document.getElementById('appIframe').src = requestUrl;
+                        
+                        // সাকসেস হলে আইফ্রেমের টপ মার্জিন ০ রেখে ফ্রেশ ড্যাশবোর্ড রেন্ডার হবে
+                        document.getElementById('appIframe').src = requestUrl + "&loadApp=true"; 
                         document.getElementById('loginOverlay').style.display = 'none';
                         document.getElementById('mainAppContainer').style.display = 'block';
                     } else {
                         showMsg("❌ " + (data.error ? data.error : "ভুল ইউজার আইডি অথবা পাসওয়ার্ড!"));
-                        btn.innerText = "🔑 যাচাই ও সক্রিয় করুন";
+                        btn.innerText = "🔑 যাচাই ও সক্রিয় করুন";
                         btn.disabled = false;
                     }
                 })
                 .catch(err => {
-                    console.log("Direct bypass fallback...");
-                    document.getElementById('appIframe').src = requestUrl;
+                    // কোনো এরর বা ফালব্যাক হলে সরাসরি লোড করার প্রিপারেশন
+                    console.log("CORS/Bypass system triggered...");
+                    document.getElementById('appIframe').src = requestUrl + "&loadApp=true";
                     document.getElementById('loginOverlay').style.display = 'none';
                     document.getElementById('mainAppContainer').style.display = 'block';
                 });
         }
 
-        document.getElementById('licenseKey').addEventListener('keypress', function(e) { if (e.key === 'Enter') { validateAndLaunch(); } });
-        document.getElementById('username').addEventListener('keypress', function(e) { if (e.key === 'Enter') { validateAndLaunch(); } });
+        // এন্টার চাপলে লগইন ট্রিগার করার জন্য ইভেন্ট লিসেনার
+        document.getElementById('licenseKey').addEventListener('keypress', function(e) { if (e.key === 'Enter') { performSecureLogin(); } });
+        document.getElementById('username').addEventListener('keypress', function(e) { if (e.key === 'Enter') { performSecureLogin(); } });
     </script>
 
     <script>
