@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
     <title>স্কুল ম্যানেজমেন্ট সিস্টেম</title>
+
+    <link rel="icon" type="image/png" href="https://i.ibb.co/your-logo-link/favicon.png" />
+    
     <link href="https://fonts.googleapis.com/css2?family=SolaimanLipi&display=swap" rel="stylesheet" />
     
     <style>
@@ -19,7 +23,6 @@
         .main-container {
             width: 100%;
             height: 100%;
-            position: relative; /* লোগোকে এটার সাপেক্ষে পজিশন করার জন্য */
             overflow: hidden;
             -webkit-overflow-scrolling: touch;
         }
@@ -31,27 +34,12 @@
             width: 100%;
             height: calc(100% + 30px); 
             border: none;
-            z-index: 1; /* iframe থাকবে নিচে */
-        }
-
-        /* 🌟 ভাসমান লোগোর জন্য নতুন স্টাইল */
-        .app-logo {
-            position: absolute;
-            top: 15px;       /* উপর থেকে দূরত্ব */
-            left: 15px;      /* বাম থেকে দূরত্ব */
-            width: 55px;     /* লোগোর সাইজ (প্রয়োজনমত কম-বেশি করতে পারবেন) */
-            height: 55px;    /* লোগোর উচ্চতা */
-            z-index: 9999;   /* যেন লোগোটি সবসময় iframe এর উপরে ভেসে থাকে */
-            pointer-events: none; /* লোগোর উপর ক্লিক করলেও যেন নিচের অ্যাপে ক্লিক কাজ করে */
-            filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3)); /* সুন্দর শ্যাডো এফেক্ট */
         }
     </style>
 </head>
 <body>
 
     <div class="main-container">
-        <img src="https://i.ibb.co/your-logo-link/logo.png" alt="Logo" class="app-logo" />
-
         <iframe src="https://script.google.com/macros/s/AKfycbxgu1dCqJUPrJ_epZl4whCX4prSbddOOf3WPNsCf1ukh3GKJE7F87oqm6gzoXl8rmR16Q/exec"></iframe>
     </div>
 
