@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>মাদ্রাসা ম্যানেজমেন্ট সিস্টেম</title>
 
-    <!-- ব্রাউজার ট্যাব লোগো -->
     <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1ZgIsgAfGHmoJuK86BmxUQBIz51vAlFxE" />
     <link href="https://fonts.googleapis.com/css2?family=SolaimanLipi&display=swap" rel="stylesheet" />
     
@@ -24,7 +23,7 @@
             color: #f8fafc;
         }
         
-        /* 🔒 লগইন স্ক্রিনের চমৎকার স্টাইল */
+        /* 🔒 লগইন/লাইসেন্স ভেরিফিকেশন স্ক্রিনের চমৎকার ডার্ক স্টাইল */
         .login-overlay {
             position: fixed;
             top: 0;
@@ -42,9 +41,9 @@
             background: #1e293b;
             padding: 40px 30px;
             border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
             text-align: center;
             border: 1px solid #334155;
         }
@@ -52,7 +51,7 @@
             width: 90px;
             height: 90px;
             margin-bottom: 20px;
-            filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.3));
+            filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.4));
             object-fit: contain;
         }
         .login-card h2 {
@@ -106,23 +105,13 @@
         .login-btn:hover {
             background: #0369a1;
         }
-        .login-btn:disabled {
-            background: #475569;
-            cursor: not-allowed;
-        }
-        .error-msg {
-            color: #ef4444;
-            font-size: 14px;
-            margin-top: 15px;
-            display: none;
-        }
-
-        /* 📱 মূল অ্যাপ কন্টেইনার (লগইনের পর দেখাবে) */
+        
+        /* 📱 মূল অ্যাপ কন্টেইনার (লগইনের পর সোর্স একটিভ হবে) */
         .main-container {
             width: 100%;
             height: 100%;
             overflow: hidden;
-            display: none; /* প্রথমে এটি লুকানো থাকবে */
+            display: none; 
         }
         iframe {
             position: absolute;
@@ -136,102 +125,82 @@
 </head>
 <body>
 
-    <!-- 🔒 লগইন ফর্ম সেকশন -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-card">
-            <!-- আপনার মাদ্রাসার সুন্দর লোগো -->
             <img src="https://lh3.googleusercontent.com/d/1ZgIsgAfGHmoJuK86BmxUQBIz51vAlFxE" alt="Madrasa Logo" class="madrasa-logo" />
-            <h2>মাদ্রাসা ড্যাশবোর্ড</h2>
-            <p>অনুগ্রহ করে আপনার অ্যাকাউন্ট লগইন করুন</p>
+            <h2>লাইসেন্স ভেরিফিকেশন</h2>
+            <p>সফটওয়্যারটি ব্যবহার করতে অনুগ্রহ করে ইউজারনেম এবং লাইসেন্স কি দিন</p>
             
             <div class="input-group">
                 <label for="username">ইউজারনেম</label>
-                <input type="text" id="username" required />
+                <input type="text" id="username" placeholder="যেমন: befaq" required />
             </div>
             
             <div class="input-group">
-                <label for="password">পাসওয়ার্ড</label>
-                <input type="password" id="password" placeholder="••••••••" required />
+                <label for="licenseKey">লাইসেন্স কি / পাসওয়ার্ড</label>
+                <input type="password" id="licenseKey" placeholder="যেমন: 3527-E9RE-IR4G-ZEEX" required />
             </div>
             
-            <button class="login-btn" id="loginBtn" onclick="submitLogin()">প্রবেশ করুন</button>
-            <div class="error-msg" id="errorMsg"></div>
+            <button class="login-btn" id="loginBtn" onclick="validateAndLaunch()">🔑 সক্রিয় করুন</button>
         </div>
     </div>
 
-    <!-- 🖥️ মূল অ্যাপ (লগইন সফল হলে আইফ্রেম লোড হবে) -->
     <div class="main-container" id="mainAppContainer">
-        <!-- এখানে প্রথমে src খালি রাখা হয়েছে সিকিউরিটির জন্য, লগইন হলে স্ক্রিপ্ট দিয়ে লোড হবে -->
         <iframe id="appIframe" src=""></iframe>
     </div>
 
-    <!-- 🟢 লগইন হ্যান্ডলিং স্ক্রিপ্ট -->
     <script>
-        // ব্যাকএন্ড গুগল স্ক্রিপ্টের সাথে কানেক্ট করতে এই ফাংশন লাগবে
-        // যেহেতু ফ্রন্টএন্ড এবং ব্যাকএন্ড আলাদা, তাই আমরা JSONP বা সরাসরি API কলের অল্টারনেটিভ হিসেবে GAS Web App URL ব্যবহার করতে পারি।
-        // তবে সবচেয়ে ইজি এবং সিকিউর সিস্টেম হলো আপনার গুগল অ্যাপ স্ক্রিপ্টের এক্সিকিউশন URL এ ডাটা পাঠানো।
-        
-        var GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyInsJm3XYiZt2VoesE4_vconnWsFjywAn6zY1cniI9CKUYwE2f6kSgw1TXqOzZhYvMUQ/exec";
+        // 🎯 আপনার দেওয়া নতুন সিকিউরড গুগল ব্যাকএন্ড লিঙ্ক
+        var GAS_URL = "https://script.google.com/macros/s/AKfycbwJUqn-_Vu6PC4D0j5K7VKQFOfUzdCCU35obhmYWG4suG-52YgEOUuLlj0W39-Fc8Fp8g/exec";
 
-        function submitLogin() {
+        function validateAndLaunch() {
             var userField = document.getElementById('username').value.trim();
-            var passField = document.getElementById('password').value.trim();
-            var loginBtn  = document.getElementById('loginBtn');
-            var errorMsg  = document.getElementById('errorMsg');
+            var keyField  = document.getElementById('licenseKey').value.trim();
 
-            if (!userField || !passField) {
-                showError('অনুগ্রহ করে ইউজারনেম এবং পাসওয়ার্ড লিখুন।');
+            if (!userField || !keyField) {
+                alert('অনুগ্রহ করে ইউজারনেম এবং লাইসেন্স কি দুটোই সঠিকভাবে লিখুন।');
                 return;
             }
 
-            // বাটন ডিজেবল ও লোডিং স্টেট
-            loginBtn.disabled = true;
-            loginBtn.innerText = 'যাচাই করা হচ্ছে...';
-            errorMsg.style.display = 'none';
+            // 🚀 সিকিউর ইউআরএল জেনারেশন (প্যারামিটার সহ)
+            var secureLink = GAS_URL + "?user=" + encodeURIComponent(userField) + "&key=" + encodeURIComponent(keyField);
 
-            // সিকিউর ভেরিফিকেশনের জন্য সরাসরি GAS URL-এ রিকোয়েস্ট পাঠানো (Fetch API এর মাধ্যমে)
-            // এটি গুগল শিটের ডাটার সাথে নিখুঁতভাবে চেক করবে
-            var url = GAS_WEB_APP_URL + "?action=loginCheck&user=" + encodeURIComponent(userField) + "&pass=" + encodeURIComponent(passField);
-
-            // ক্রস-অরিজিন পলিসি হ্যান্ডেল করার জন্য আমরা আইফ্রেমের সোর্স কন্ট্রোল বা ব্যাকএন্ড স্ক্রিপ্ট ব্যবহার করি।
-            // তবে সরাসরি আপনার GAS-এ `google.script.run` না থাকলে আমরা API গেটওয়ে হিসেবে fetch ব্যবহার করছি।
-            // আপনার GAS অ্যাপ যদি doGet(e) সাপোর্ট করে তবে এটি জাদুকরী কাজ করবে। 
+            // ইন্টারফেস পরিবর্তন
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('mainAppContainer').style.display = 'block';
             
-            // শর্টকাট সিকিউরিটি: যেহেতু আপনার আইফ্রেমটি অলরেডি গুগল স্ক্রিপ্টের, তাই ব্রাউজারে 'anas' ও 'Tamanna@77' দিয়ে সাময়িক চেক নিশ্চিত করতে চাইলে নিচে ক্লায়েন্ট সাইড চেকও ব্যাকআপ রাখা হয়েছে।
-            
-            // তবে ১০০% শিট থেকে লাইভ চেক করার জন্য সবচেয়ে সহজ ও হ্যাকার-প্রুফ উপায়:
-            // আমরা সরাসরি শিটের ডাটা ফেচ মেকানিজম বা google script API ব্যবহার করি। 
-            // যেহেতু এটি github.io (আলাদা ডোমেন), আমরা শিটের ডাটাবেজ ভ্যালিডেশন করে অ্যাপ ওপেন করছি:
-            
-            // নিচে ১টি স্ট্যান্ডার্ড গেটওয়ে মেথড দেওয়া হলো যা আপনার দেওয়া ডাটা 'anas' ও 'Tamanna@77' দিয়ে ইনস্ট্যান্ট গেট লক খুলবে:
-            if((userField === "anas" || userField === "1780650714") && passField === "Tamanna@77") {
-                // লগইন সফল!
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('mainAppContainer').style.display = 'block';
-                // সিকিউরিটি লক: লগইন হওয়ার পরেই কেবল আইফ্রেমের সোর্স লোড হবে, তার আগে কেউ লিঙ্ক দেখতে পাবে না
-                document.getElementById('appIframe').src = GAS_WEB_APP_URL; 
-            } else {
-                // যদি ভুল হয়
-                setTimeout(function() {
-                    loginBtn.disabled = false;
-                    loginBtn.innerText = 'প্রবেশ করুন';
-                    showError('ভুল ইউজার আইডি অথবা পাসওয়ার্ড! আবার চেষ্টা করুন।');
-                }, 800);
-            }
+            // আইফ্রেমের সোর্সে রিকোয়েস্ট পাঠানো হলো
+            document.getElementById('appIframe').src = secureLink;
         }
 
-        function showError(msg) {
-            var errorMsg = document.getElementById('errorMsg');
-            errorMsg.innerText = msg;
-            errorMsg.style.display = 'block';
-        }
-
-        // এন্টার চাপলে যেন লগইন হয়
-        document.getElementById('password').addEventListener('keypress', function(e) {
+        // কীবোর্ডের এন্টার চাপলে যেন অটো সাবমিট হয়
+        document.getElementById('licenseKey').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                submitLogin();
+                validateAndLaunch();
             }
         });
     </script>
+
+    <script>
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123) {
+                return false;
+            }
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+                return false;
+            }
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+                return false;
+            }
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+                return false;
+            }
+        };
+    </script>
+
 </body>
 </html>
