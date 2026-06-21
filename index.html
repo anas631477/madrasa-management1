@@ -123,26 +123,29 @@
             height: 100%;
             overflow: hidden;
             display: none; 
+            position: relative;
         }
+        
+        /* 🚀 গুগলের টপ ব্যানার চিরতরে ওপরে ঠেলে হাইড করার ম্যাজিক ট্রিক */
         iframe {
             position: absolute;
-            top: -10px;
+            top: -50px; /* গুগলের ব্যানার ৫০ পিক্সেল ওপরে উঠে হাওয়া হয়ে যাবে */
             left: 0;
             width: 100%;
-            height: calc(100% + 30px); 
+            height: calc(100vh + 50px); /* ওপরে তোলার ব্যালেন্স ঠিক রাখতে হাইট ৫০ পিক্সেল প্লাস */
             border: none;
+            background-color: #0f172a;
         }
     </style>
 </head>
 <body>
 
     <div class="login-overlay" id="loginOverlay">
-        <div class="login-card">
+        <div class="login-card" id="loginCardContainer">
             <img src="https://lh3.googleusercontent.com/d/1ZgIsgAfGHmoJuK86BmxUQBIz51vAlFxE" alt="Madrasa Logo" class="madrasa-logo" />
             <h2>লাইসেন্স ভেরিফিকেশন</h2>
             <p>সফটওয়্যারটি ব্যবহার করতে অনুগ্রহ করে ইউজারনেম এবং পাসওয়ার্ড দিন</p>
             
-            <!-- এরর মেসেজ দেখানোর কন্টেইনার -->
             <div class="error-msg" id="errorBlock"></div>
             
             <div class="input-group">
@@ -155,7 +158,7 @@
                 <input type="password" id="licenseKey" placeholder="যেমন: tamanna@77" required />
             </div>
             
-            <button class="login-btn" id="loginBtn" onclick="validateAndLaunch()">🔑 যাচাই ও সক্রিয় করুন</button>
+            <button class="login-btn" id="loginBtn" onclick="validateAndLaunch()">🔑 যাচাই ও সক্রিয় করুন</button>
         </div>
     </div>
 
@@ -166,6 +169,24 @@
     <script>
         // 🎯 আপনার গুগল এক্সিকিউটেবল ম্যাক্রো লিঙ্ক
         var GAS_URL = "https://script.google.com/macros/s/AKfycbz6gN9ad_muygicWHBm6kOlOFfxrowy__BDxVdCYMI-BHK54mDIVJ7moLId1s22uvCfmA/exec";
+
+        // 🚨 গিটহাব পেজ লোড হওয়ার সময়ই চেক করবে কেউ ডিরেক্ট লিঙ্ক থেকে লাত্থি খেয়ে ফেরত এসেছে কিনা
+        window.addEventListener('DOMContentLoaded', function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('status') === 'denied') {
+                // মেইন লগইন ফর্মটি বদলে গিটহাব থিমের ভেতরই "Access Denied" বক্স জেনারেট করবে
+                document.getElementById('loginCardContainer').innerHTML = `
+                    <div style="font-size: 60px; margin-bottom: 15px;">🔒</div>
+                    <h2 style="color: #f87171;">Access Denied!</h2>
+                    <p style="color: #94a3b8; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">
+                        আপনি সরাসরি সার্ভার লিঙ্কে প্রবেশের চেষ্টা করেছেন যা সম্পূর্ণ নিষিদ্ধ। <br>অনুগ্রহ করে এই মেইন প্ল্যাটফর্ম থেকে লগইন করুন।
+                    </p>
+                    <button class="login-btn" onclick="window.location.href=window.location.pathname" style="background: #475569;">
+                        🔄 মূল লগইন পেজে ফিরুন
+                    </button>
+                `;
+            }
+        });
 
         function showMsg(text) {
             var errBlock = document.getElementById('errorBlock');
@@ -188,13 +209,12 @@
             btn.innerText = "সার্ভার যাচাই করা হচ্ছে...";
             btn.disabled = true;
 
-            // 🚀 ব্যাকগ্রাউন্ডে গুগল শিটে রিকোয়েস্ট পাঠানো (API Fetch)
+            // 🚀 ব্যাকগ্রাউন্ডে গুগল শিটে রিকোয়েস্ট পাঠানো (API Fetch)
             var requestUrl = GAS_URL + "?user=" + encodeURIComponent(userField) + "&key=" + encodeURIComponent(keyField);
 
             fetch(requestUrl)
                 .then(response => response.json())
                 .then(data => {
-                    // যদি আপনার গুগল শিট ফাইল রেসপন্সে success: true পাঠায়
                     if (data && data.success) {
                         btn.innerText = "🎉 লগইন সফল! ড্যাশবোর্ড ওপেন হচ্ছে...";
                         
@@ -205,14 +225,12 @@
                         document.getElementById('loginOverlay').style.display = 'none';
                         document.getElementById('mainAppContainer').style.display = 'block';
                     } else {
-                        // যদি ভুল পাসওয়ার্ড বা ইনঅ্যাক্টিভ ইউজার হয়
                         showMsg("❌ " + (data.error ? data.error : "ভুল ইউজার আইডি অথবা পাসওয়ার্ড!"));
-                        btn.innerText = "🔑 যাচাই ও সক্রিয় করুন";
+                        btn.innerText = "🔑 যাচাই ও সক্রিয় করুন";
                         btn.disabled = false;
                     }
                 })
                 .catch(err => {
-                    // কোনো কারণে নেট বা গুগল স্ক্রিপ্ট ব্লক থাকলে আইফ্রেম ডিরেক্ট রান করার ব্যাকআপ ব্যবস্থা
                     console.log("Fetch blocked, using direct bypass method...");
                     document.getElementById('appIframe').src = requestUrl;
                     document.getElementById('loginOverlay').style.display = 'none';
@@ -222,25 +240,16 @@
 
         // কীবোর্ডের এন্টার চাপলে অটো সাবমিট
         document.getElementById('licenseKey').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                validateAndLaunch();
-            }
+            if (e.key === 'Enter') { validateAndLaunch(); }
         });
 
-        // কীবোর্ডের এন্টার ইউজারনেম বক্সেও কাজ করানোর জন্য
         document.getElementById('username').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                validateAndLaunch();
-            }
+            if (e.key === 'Enter') { validateAndLaunch(); }
         });
     </script>
 
-    <!-- 🚫 সিকিউরিটি প্রোটেকশন (রাইট ক্লিক ও ডেভ টুলস ব্লক) -->
     <script>
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
-
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
         document.onkeydown = function(e) {
             if (e.keyCode == 123) return false; // F12
             if (e.ctrlKey && e.shiftKey && e.keyCode == 73) return false; // Ctrl+Shift+I
